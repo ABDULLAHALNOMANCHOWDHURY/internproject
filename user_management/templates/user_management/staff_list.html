@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Staff{% endblock %}
+{% block header %}Staff{% endblock %}
+{% block content %}
+<div class="flex justify-end mb-5">
+  <a href="{% url 'user_management:staff_create' %}" class="bg-blue-600 text-white rounded-lg px-4 py-2 text-sm">+ Add Staff</a>
+</div>
+<div class="bg-white rounded-xl border overflow-hidden">
+<table class="w-full text-sm">
+  <thead class="bg-gray-50 text-left text-gray-500">
+    <tr><th class="px-4 py-3">Name</th><th class="px-4 py-3">Email</th><th class="px-4 py-3">Role</th><th class="px-4 py-3">Department</th><th class="px-4 py-3"></th></tr>
+  </thead>
+  <tbody>
+    {% for staff in page_obj %}
+    <tr class="border-t">
+      <td class="px-4 py-3">{{ staff.get_full_name|default:staff.username }}</td>
+      <td class="px-4 py-3">{{ staff.email }}</td>
+      <td class="px-4 py-3">{{ staff.staff_profile.role.name|default:"—" }}</td>
+      <td class="px-4 py-3">{{ staff.staff_profile.department|default:"—" }}</td>
+      <td class="px-4 py-3 text-right space-x-3">
+        <a href="{% url 'user_management:staff_edit' staff.pk %}" class="text-blue-600 hover:underline">Edit</a>
+        <a href="{% url 'user_management:staff_delete' staff.pk %}" class="text-red-600 hover:underline">Delete</a>
+      </td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="5" class="px-4 py-6 text-center text-gray-400">No staff accounts yet.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+{% endblock %}

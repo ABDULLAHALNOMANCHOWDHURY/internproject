@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}Customers{% endblock %}
+{% block header %}Customers{% endblock %}
+{% block content %}
+<form class="flex gap-3 mb-5" method="get">
+  <input type="text" name="q" value="{{ q }}" placeholder="Search name, email, username..."
+         class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm">
+  <select name="status" class="rounded-lg border border-gray-300 px-3 py-2 text-sm">
+    <option value="">All statuses</option>
+    <option value="active" {% if status == "active" %}selected{% endif %}>Active</option>
+    <option value="banned" {% if status == "banned" %}selected{% endif %}>Banned</option>
+  </select>
+  <button class="bg-blue-600 text-white rounded-lg px-4 py-2 text-sm">Search</button>
+</form>
+
+<div class="bg-white rounded-xl border overflow-hidden">
+<table class="w-full text-sm">
+  <thead class="bg-gray-50 text-left text-gray-500">
+    <tr>
+      <th class="px-4 py-3">Name</th>
+      <th class="px-4 py-3">Email</th>
+      <th class="px-4 py-3">Phone</th>
+      <th class="px-4 py-3">Status</th>
+      <th class="px-4 py-3">Joined</th>
+      <th class="px-4 py-3"></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for customer in page_obj %}
+    <tr class="border-t">
+      <td class="px-4 py-3">{{ customer.get_full_name|default:customer.username }}</td>
+      <td class="px-4 py-3">{{ customer.email }}</td>
+      <td class="px-4 py-3">{{ customer.phone|default:"—" }}</td>
+      <td class="px-4 py-3">
+        {% if customer.is_banned %}
+          <span class="px-2 py-0.5 rounded-full bg-red-50 text-red-600 text-xs">Banned</span>
+        {% else %}
+          <span class="px-2 py-0.5 rounded-full bg-green-50 text-green-600 text-xs">Active</span>
+        {% endif %}
+      </td>
+      <td class="px-4 py-3">{{ customer.created_at|date:"M d, Y" }}</td>
+      <td class="px-4 py-3 text-right">
+        <a href="{% url 'user_management:customer_detail' customer.pk %}" class="text-blue-600 hover:underline">View</a>
+      </td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="6" class="px-4 py-6 text-center text-gray-400">No customers found.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+
+{% if page_obj.has_other_pages %}
+<div class="flex gap-2 mt-4 text-sm">
+  {% if page_obj.has_previous %}<a class="text-blue-600" href="?page={{ page_obj.previous_page_number }}&q={{ q }}&status={{ status }}">Prev</a>{% endif %}
+  <span class="text-gray-500">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+  {% if page_obj.has_next %}<a class="text-blue-600" href="?page={{ page_obj.next_page_number }}&q={{ q }}&status={{ status }}">Next</a>{% endif %}
+</div>
+{% endif %}
+{% endblock %}

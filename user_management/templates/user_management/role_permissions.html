@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}{{ role.name }} Permissions{% endblock %}
+{% block header %}Permissions: {{ role.name }}{% endblock %}
+{% block content %}
+<form method="post" class="bg-white rounded-xl border p-6 max-w-xl">
+  {% csrf_token %}
+  <div class="space-y-2 max-h-96 overflow-y-auto">
+    {% for perm in all_perms %}
+    <label class="flex items-center gap-3 text-sm py-1">
+      <input type="checkbox" name="permissions" value="{{ perm.id }}" {% if perm.id in current_ids %}checked{% endif %}>
+      <span>{{ perm.name }}</span>
+      <span class="text-xs text-gray-400">({{ perm.codename }})</span>
+    </label>
+    {% empty %}
+    <p class="text-gray-400 text-sm">No permissions found — run migrations first.</p>
+    {% endfor %}
+  </div>
+  <button class="bg-blue-600 text-white rounded-lg px-4 py-2 text-sm mt-5">Save permissions</button>
+</form>
+{% endblock %}

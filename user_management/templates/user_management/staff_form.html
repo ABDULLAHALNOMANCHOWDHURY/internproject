@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Staff Form{% endblock %}
+{% block header %}{% if staff %}Edit Staff{% else %}Add Staff{% endif %}{% endblock %}
+{% block content %}
+<form method="post" class="bg-white rounded-xl border p-6 max-w-lg space-y-4">
+  {% csrf_token %}
+  {% for field in form %}
+    <div>
+      <label class="block text-sm text-gray-600 mb-1">{{ field.label }}</label>
+      {{ field }}
+      {% if field.help_text %}<p class="text-xs text-gray-400 mt-1">{{ field.help_text }}</p>{% endif %}
+      {% if field.errors %}<p class="text-red-600 text-xs mt-1">{{ field.errors|striptags }}</p>{% endif %}
+    </div>
+  {% endfor %}
+  <button class="bg-blue-600 text-white rounded-lg px-4 py-2 text-sm">Save</button>
+</form>
+{% endblock %}

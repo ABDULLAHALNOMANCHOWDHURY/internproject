@@ -1,0 +1,232 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-5">
+
+  <!-- Total Customer -->
+  <div class="bg-white rounded-xl border p-6">
+    <div class="flex justify-between items-start">
+      <div class="text-3xl font-bold">{{ stats.total_customers }}</div>
+      <span class="text-gray-300 text-xl">👥</span>
+    </div>
+    <div class="text-gray-500 text-sm mt-1 mb-4">Total Customer</div>
+    <div class="flex items-center gap-2 text-xs text-gray-500 mb-2">
+      <span class="w-1.5 h-1.5 rounded-full bg-red-400"></span> Top Customers
+    </div>
+    <div class="flex -space-x-2">
+      {% for c in top_customers %}
+      <div class="w-8 h-8 rounded-full bg-slate-700 text-white text-xs flex items-center justify-center border-2 border-white" title="{{ c.customer__username }} — ৳{{ c.spent }}">
+        {{ c.customer__username|slice:":1"|upper }}
+      </div>
+      {% empty %}
+      <span class="text-xs text-gray-400">No completed orders yet.</span>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Total Products -->
+  <div class="bg-white rounded-xl border p-6">
+    <div class="flex justify-between items-start">
+      <div class="text-3xl font-bold">{{ stats.total_products }}</div>
+      <span class="text-gray-300 text-xl">📦</span>
+    </div>
+    <div class="text-gray-500 text-sm mt-1 mb-4">Total Products</div>
+    <div class="flex justify-between text-sm py-1">
+      <span class="flex items-center gap-2 text-gray-600"><span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> Inhouse Products</span>
+      <span>{{ stats.inhouse_products }}</span>
+    </div>
+    <div class="flex justify-between text-sm py-1">
+      <span class="flex items-center gap-2 text-gray-600"><span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span> Sellers Products</span>
+      <span>{{ stats.seller_products }}</span>
+    </div>
+  </div>
+
+  <!-- Total Sales (highlighted) -->
+  <div class="bg-blue-50 rounded-xl p-6">
+    <div class="text-3xl font-bold text-blue-600">{{ stats.total_sales }}</div>
+    <div class="text-blue-600 text-sm mt-1 mb-4">Total Sales</div>
+    <div class="bg-blue-600 text-white rounded-lg px-4 py-2.5 flex justify-between items-center text-sm mb-4">
+      <span>Sales this month</span><span>৳{{ stats.sales_this_month }}</span>
+    </div>
+    <div class="text-blue-600 text-xs font-medium mb-2">Sales Stat</div>
+    <canvas id="salesStat" height="60"></canvas>
+    <div class="flex justify-between text-sm mt-3">
+      <span class="flex items-center gap-2 text-gray-600"><span class="w-1.5 h-1.5 rounded-full bg-purple-500"></span> In-house Sales</span>
+      <span>৳{{ stats.inhouse_sales }}</span>
+    </div>
+    <div class="flex justify-between text-sm">
+      <span class="flex items-center gap-2 text-gray-600"><span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> Sellers Sales</span>
+      <span>৳{{ stats.seller_sales }}</span>
+    </div>
+  </div>
+
+  <!-- Total sellers -->
+  <div class="bg-white rounded-xl border p-6">
+    <div class="text-3xl font-bold">{{ stats.total_sellers }}</div>
+    <div class="text-gray-500 text-sm mt-1 mb-4">Total sellers</div>
+    <div class="flex justify-between text-sm py-1">
+      <span class="flex items-center gap-2 text-gray-600"><span class="w-1.5 h-1.5 rounded-full bg-red-400"></span> Pending Seller</span>
+      <span>{{ stats.pending_sellers }}</span>
+    </div>
+    <div class="flex justify-between text-sm py-1 mb-3">
+      <span class="flex items-center gap-2 text-gray-600"><span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> Approved Sellers</span>
+      <span>{{ stats.approved_sellers }}</span>
+    </div>
+    <div class="text-xs text-gray-500 mb-1 flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span> Top Sellers</div>
+    <ul class="text-sm text-gray-600 mb-3">
+      {% for s in top_sellers %}
+      <li class="flex justify-between py-0.5"><span>{{ s.product__seller__username }}</span><span>৳{{ s.total }}</span></li>
+      {% empty %}
+      <li class="text-xs text-gray-400">No seller sales yet.</li>
+      {% endfor %}
+    </ul>
+    <a href="{% url 'user_management:seller_list' %}" class="block text-center bg-green-50 text-green-700 rounded-lg py-2 text-sm mb-2">All Sellers</a>
+    <a href="{% url 'user_management:seller_list' %}?status=pending" class="block text-center bg-red-50 text-red-600 rounded-lg py-2 text-sm">Pending Sellers</a>
+  </div>
+
+</div>
+
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-5">
+
+  <!-- Total Category -->
+  <div class="bg-white rounded-xl border p-6">
+    <div class="flex justify-between items-start">
+      <div class="text-3xl font-bold">{{ stats.total_categories }}</div>
+      <span class="text-gray-300 text-xl">🗂️</span>
+    </div>
+    <div class="text-gray-500 text-sm mt-1 mb-4">Total Category</div>
+    <ul class="text-sm">
+      {% for row in category_stats_default %}
+      <li class="flex justify-between py-1"><span class="text-gray-600">{{ row.name }}</span><span>৳{{ row.total }}</span></li>
+      {% empty %}
+      <li class="text-xs text-gray-400">No category sales yet.</li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  <!-- Total Brands -->
+  <div class="bg-white rounded-xl border p-6">
+    <div class="flex justify-between items-start">
+      <div class="text-3xl font-bold">{{ stats.total_brands }}</div>
+      <span class="text-gray-300 text-xl">🏷️</span>
+    </div>
+    <div class="text-gray-500 text-sm mt-1 mb-4">Total Brands</div>
+    <ul class="text-sm">
+      {% for row in brand_stats_default %}
+      <li class="flex justify-between py-1"><span class="text-gray-600">{{ row.name }}</span><span>৳{{ row.total }}</span></li>
+      {% empty %}
+      <li class="text-xs text-gray-400">No brand sales yet.</li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  <!-- Total Order -->
+  <div class="bg-violet-50 rounded-xl p-6 flex flex-col justify-center">
+    <div class="text-3xl font-bold text-violet-700">{{ stats.total_orders }}</div>
+    <div class="text-violet-700 text-sm mt-1">Total Order</div>
+  </div>
+
+  <!-- Order placed -->
+  <div class="bg-sky-50 rounded-xl p-6 flex items-center gap-4">
+    <span class="text-sky-600 text-2xl">📘</span>
+    <div>
+      <div class="text-sky-700 text-sm">Order placed</div>
+      <div class="text-2xl font-bold text-sky-700">{{ stats.orders_placed }}</div>
+    </div>
+  </div>
+
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+
+  <div class="bg-white rounded-xl border p-6">
+    <h3 class="text-blue-600 font-medium mb-3">In-house Top Category</h3>
+    <div class="text-xs text-gray-500 mb-2">By Sales</div>
+    <div class="flex gap-2 mb-4 text-xs">
+      <button class="period-btn cat-tab px-3 py-1 rounded-lg bg-blue-600 text-white" data-period="all">All</button>
+      <button class="period-btn cat-tab px-3 py-1 rounded-lg text-gray-500" data-period="today">Today</button>
+      <button class="period-btn cat-tab px-3 py-1 rounded-lg text-gray-500" data-period="week">Week</button>
+      <button class="period-btn cat-tab px-3 py-1 rounded-lg text-gray-500" data-period="month">Month</button>
+    </div>
+    <ul id="categoryTabList" class="text-sm space-y-1"></ul>
+  </div>
+
+  <div class="bg-white rounded-xl border p-6">
+    <h3 class="text-rose-600 font-medium mb-3">In-house Top Brands</h3>
+    <div class="text-xs text-gray-500 mb-2">By Sales</div>
+    <div class="flex gap-2 mb-4 text-xs">
+      <button class="period-btn brand-tab px-3 py-1 rounded-lg bg-rose-600 text-white" data-period="all">All</button>
+      <button class="period-btn brand-tab px-3 py-1 rounded-lg text-gray-500" data-period="today">Today</button>
+      <button class="period-btn brand-tab px-3 py-1 rounded-lg text-gray-500" data-period="week">Week</button>
+      <button class="period-btn brand-tab px-3 py-1 rounded-lg text-gray-500" data-period="month">Month</button>
+    </div>
+    <ul id="brandTabList" class="text-sm space-y-1"></ul>
+  </div>
+
+</div>
+
+<div class="bg-white rounded-xl border p-6 mt-5">
+  <h3 class="text-sm font-medium text-gray-600 mb-3">Not built yet</h3>
+  <p class="text-xs text-gray-400 mb-3">These sections don't have dedicated management pages yet — use Django admin (<code>/admin/</code>) in the meantime.</p>
+  <div class="flex flex-wrap gap-2 text-xs text-gray-500">
+    {% for item in not_built %}
+    <span class="px-2.5 py-1 rounded-full bg-gray-100">{{ item }}</span>
+    {% endfor %}
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script>
+  // Yearly sales sparkline (in-house vs seller)
+  new Chart(document.getElementById('salesStat'), {
+    type: 'line',
+    data: {
+      labels: {{ month_labels|safe }},
+      datasets: [
+        { label: 'In-house', data: {{ inhouse_series|safe }}, borderColor: '#7c3aed', backgroundColor: 'transparent', tension: 0.3, pointRadius: 3 },
+        { label: 'Sellers', data: {{ seller_series|safe }}, borderColor: '#16a34a', backgroundColor: 'transparent', tension: 0.3, pointRadius: 3 },
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: { x: { display: false }, y: { display: false } },
+    }
+  });
+
+  // Category / Brand period tabs — data was pre-aggregated server-side for
+  // every period, so switching tabs is instant with no reload.
+  const categoryStats = {{ category_stats_json|safe }};
+  const brandStats = {{ brand_stats_json|safe }};
+
+  function renderList(el, rows) {
+    el.innerHTML = '';
+    if (!rows.length) {
+      el.innerHTML = '<li class="text-xs text-gray-400">No sales in this period.</li>';
+      return;
+    }
+    rows.forEach(r => {
+      const li = document.createElement('li');
+      li.className = 'flex justify-between py-1';
+      li.innerHTML = `<span class="text-gray-600">${r.name}</span><span>৳${parseFloat(r.total).toFixed(2)}</span>`;
+      el.appendChild(li);
+    });
+  }
+
+  function wireTabs(buttonClass, listId, dataset, activeClasses) {
+    const buttons = document.querySelectorAll('.' + buttonClass);
+    const list = document.getElementById(listId);
+    renderList(list, dataset['all']);
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        buttons.forEach(b => b.className = 'period-btn ' + buttonClass + ' px-3 py-1 rounded-lg text-gray-500');
+        btn.className = 'period-btn ' + buttonClass + ' px-3 py-1 rounded-lg ' + activeClasses;
+        renderList(list, dataset[btn.dataset.period]);
+      });
+    });
+  }
+  wireTabs('cat-tab', 'categoryTabList', categoryStats, 'bg-blue-600 text-white');
+  wireTabs('brand-tab', 'brandTabList', brandStats, 'bg-rose-600 text-white');
+</script>
+{% endblock %}

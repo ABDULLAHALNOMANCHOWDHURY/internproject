@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}{{ customer }}{% endblock %}
+{% block header %}Customer: {{ customer }}{% endblock %}
+{% block content %}
+<div class="bg-white rounded-xl border p-6 max-w-2xl">
+  <dl class="grid grid-cols-2 gap-y-3 text-sm">
+    <dt class="text-gray-500">Username</dt><dd>{{ customer.username }}</dd>
+    <dt class="text-gray-500">Email</dt><dd>{{ customer.email }}</dd>
+    <dt class="text-gray-500">Phone</dt><dd>{{ customer.phone|default:"—" }}</dd>
+    <dt class="text-gray-500">Address</dt><dd>{{ customer.customer_profile.address|default:"—" }}</dd>
+    <dt class="text-gray-500">Total orders</dt><dd>{{ customer.customer_profile.total_orders }}</dd>
+    <dt class="text-gray-500">Total spent</dt><dd>{{ customer.customer_profile.total_spent }}</dd>
+    <dt class="text-gray-500">Status</dt>
+    <dd>
+      {% if customer.is_banned %}
+        <span class="text-red-600">Banned{% if customer.ban_reason %} — {{ customer.ban_reason }}{% endif %}</span>
+      {% else %}
+        <span class="text-green-600">Active</span>
+      {% endif %}
+    </dd>
+  </dl>
+
+  <div class="flex gap-3 mt-6">
+    <a href="{% url 'user_management:customer_edit' customer.pk %}" class="bg-gray-100 rounded-lg px-4 py-2 text-sm">Edit</a>
+    <form method="post" action="{% url 'user_management:customer_ban_toggle' customer.pk %}">
+      {% csrf_token %}
+      {% if customer.is_banned %}
+        <button class="bg-green-600 text-white rounded-lg px-4 py-2 text-sm">Unban</button>
+      {% else %}
+        <a href="{% url 'user_management:customer_ban_toggle' customer.pk %}" class="inline-block bg-red-600 text-white rounded-lg px-4 py-2 text-sm">Ban</a>
+      {% endif %}
+    </form>
+    <a href="{% url 'user_management:customer_delete' customer.pk %}" class="text-red-600 text-sm self-center hover:underline">Delete</a>
+  </div>
+</div>
+{% endblock %}

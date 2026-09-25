@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Delete{% endblock %}
+{% block header %}Delete {{ target }}?{% endblock %}
+{% block content %}
+<div class="bg-white rounded-xl border p-6 max-w-lg">
+  <p class="text-sm text-gray-600 mb-4">This action is permanent and cannot be undone.</p>
+  <form method="post" class="flex gap-3">
+    {% csrf_token %}
+    <button class="bg-red-600 text-white rounded-lg px-4 py-2 text-sm">Yes, delete</button>
+    <a href="javascript:history.back()" class="text-sm self-center text-gray-500">Cancel</a>
+  </form>
+</div>
+{% endblock %}

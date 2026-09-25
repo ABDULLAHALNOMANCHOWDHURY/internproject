@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Roles{% endblock %}
+{% block header %}Roles & Permissions{% endblock %}
+{% block content %}
+<div class="grid grid-cols-3 gap-6">
+  <div class="col-span-2 bg-white rounded-xl border overflow-hidden h-fit">
+    <table class="w-full text-sm">
+      <thead class="bg-gray-50 text-left text-gray-500">
+        <tr><th class="px-4 py-3">Role</th><th class="px-4 py-3">Description</th><th class="px-4 py-3">Staff assigned</th><th class="px-4 py-3"></th></tr>
+      </thead>
+      <tbody>
+        {% for role in roles %}
+        <tr class="border-t">
+          <td class="px-4 py-3">{{ role.name }}</td>
+          <td class="px-4 py-3 text-gray-500">{{ role.description|default:"—" }}</td>
+          <td class="px-4 py-3">{{ role.staff_members.count }}</td>
+          <td class="px-4 py-3 text-right"><a href="{% url 'user_management:role_permissions' role.pk %}" class="text-blue-600 hover:underline">Edit permissions</a></td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4" class="px-4 py-6 text-center text-gray-400">No roles yet — create one to get started.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <form method="post" action="{% url 'user_management:role_create' %}" class="bg-white rounded-xl border p-5 space-y-3 h-fit">
+    {% csrf_token %}
+    <h3 class="font-medium text-sm mb-2">New role</h3>
+    <div>
+      <label class="block text-xs text-gray-500 mb-1">{{ form.name.label }}</label>
+      {{ form.name }}
+    </div>
+    <div>
+      <label class="block text-xs text-gray-500 mb-1">{{ form.description.label }}</label>
+      {{ form.description }}
+    </div>
+    <button class="bg-blue-600 text-white rounded-lg px-4 py-2 text-sm w-full">Create role</button>
+  </form>
+</div>
+{% endblock %}

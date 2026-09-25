@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}{{ seller.seller_profile.shop_name }}{% endblock %}
+{% block header %}Seller: {{ seller.seller_profile.shop_name }}{% endblock %}
+{% block content %}
+<div class="bg-white rounded-xl border p-6 max-w-2xl">
+  <dl class="grid grid-cols-2 gap-y-3 text-sm">
+    <dt class="text-gray-500">Owner</dt><dd>{{ seller.get_full_name|default:seller.username }}</dd>
+    <dt class="text-gray-500">Email</dt><dd>{{ seller.email }}</dd>
+    <dt class="text-gray-500">Business email</dt><dd>{{ seller.seller_profile.business_email|default:"—" }}</dd>
+    <dt class="text-gray-500">Business phone</dt><dd>{{ seller.seller_profile.business_phone|default:"—" }}</dd>
+    <dt class="text-gray-500">Address</dt><dd>{{ seller.seller_profile.business_address|default:"—" }}</dd>
+    <dt class="text-gray-500">Commission rate</dt><dd>{{ seller.seller_profile.commission_rate }}%</dd>
+    <dt class="text-gray-500">Approval status</dt><dd>{{ seller.seller_profile.get_approval_status_display }}</dd>
+    {% if seller.seller_profile.rejection_reason %}
+    <dt class="text-gray-500">Rejection reason</dt><dd>{{ seller.seller_profile.rejection_reason }}</dd>
+    {% endif %}
+  </dl>
+
+  <div class="flex gap-3 mt-6">
+    <a href="{% url 'user_management:seller_edit' seller.pk %}" class="bg-gray-100 rounded-lg px-4 py-2 text-sm">Edit</a>
+    {% if seller.seller_profile.approval_status != "APPROVED" %}
+    <form method="post" action="{% url 'user_management:seller_approve' seller.pk %}">
+      {% csrf_token %}<button class="bg-green-600 text-white rounded-lg px-4 py-2 text-sm">Approve</button>
+    </form>
+    {% endif %}
+    {% if seller.seller_profile.approval_status != "REJECTED" %}
+    <details>
+      <summary class="bg-red-600 text-white rounded-lg px-4 py-2 text-sm cursor-pointer inline-block">Reject</summary>
+      <form method="post" action="{% url 'user_management:seller_reject' seller.pk %}" class="mt-2 space-y-2">
+        {% csrf_token %}
+        {{ reject_form.reason }}
+        <button class="bg-red-600 text-white rounded-lg px-3 py-1.5 text-sm">Confirm reject</button>
+      </form>
+    </details>
+    {% endif %}
+    <a href="{% url 'user_management:seller_delete' seller.pk %}" class="text-red-600 text-sm self-center hover:underline">Delete</a>
+  </div>
+</div>
+{% endblock %}

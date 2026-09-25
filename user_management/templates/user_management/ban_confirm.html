@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Ban User{% endblock %}
+{% block header %}Ban {{ target }}?{% endblock %}
+{% block content %}
+<form method="post" class="bg-white rounded-xl border p-6 max-w-lg space-y-4">
+  {% csrf_token %}
+  <label class="block text-sm text-gray-600 mb-1">{{ form.reason.label }}</label>
+  {{ form.reason }}
+  <div class="flex gap-3">
+    <button class="bg-red-600 text-white rounded-lg px-4 py-2 text-sm">Confirm Ban</button>
+    <a href="javascript:history.back()" class="text-sm self-center text-gray-500">Cancel</a>
+  </div>
+</form>
+{% endblock %}
